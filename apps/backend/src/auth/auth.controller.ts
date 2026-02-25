@@ -13,6 +13,7 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  ConflictException,
 } from '@nestjs/common';
 import type { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
@@ -86,9 +87,25 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Email already exists' })
   async register(@Body() body: RegisterDto) {
+    // Check if user already exists
+    const existingUser = await this.usersService.findByEmail(body.email);
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
+
+    // Hash password with bcrypt
     const hash = await bcrypt.hash(body.password, 10);
 
-    return this.usersService.create({ email: body.email, passwordHash: hash });
+    // Create user
+    const user = await this.usersService.create({
+      email: body.email,
+      passwordHash: hash,
+    });
+
+    // Return user without password - exclude passwordHash from response
+    const { passwordHash: _, ...result } = user;
+    void _; // Mark as intentionally unused
+    return result;
   }
 
   @Post('forgot-password')

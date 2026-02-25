@@ -138,7 +138,9 @@ export class NewsService {
       title: articleDto.title,
       url: articleDto.url,
       source: articleDto.source,
-      publishedAt: new Date(articleDto.publishedAt),
+      publishedAt: articleDto.publishedAt
+        ? new Date(articleDto.publishedAt)
+        : new Date(),
       sentimentScore: null, // Will be populated by sentiment service
     });
 
