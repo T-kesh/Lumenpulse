@@ -24,7 +24,9 @@ import stellarConfig from './stellar/config/stellar.config';
 import { TransactionModule } from './transaction/transaction.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AppCacheModule } from './cache/cache.module';
-import { StellarModule } from './stellar/stellar.module'
+import { StellarModule } from './stellar/stellar.module';
+import { WebhookModule } from './webhook/webhook.module';
+import { NotificationModule } from './notification/notification.module';
 const appLogger = new Logger('TypeORM');
 
 @Module({
@@ -78,6 +80,8 @@ const appLogger = new Logger('TypeORM');
     TransactionModule,
     ModelRetrainingModule,
     AnalyticsModule,
+    NotificationModule,
+    WebhookModule,
   ],
   controllers: [AppController, TestController, TestExceptionController],
   providers: [

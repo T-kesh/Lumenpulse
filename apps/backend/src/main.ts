@@ -31,7 +31,7 @@ function getCorsOrigin(): string | string[] {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // Register the global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());
