@@ -20,7 +20,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   GetPortfolioHistoryDto,
   PortfolioHistoryResponseDto,
-  PortfolioSummaryResponseDto,
 } from './dto/portfolio-snapshot.dto';
 import {
   GetPortfolioSummaryQueryDto,

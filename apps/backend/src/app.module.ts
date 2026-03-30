@@ -19,7 +19,6 @@ import { WebhookModule } from './webhook/webhook.module';
 import { NotificationModule } from './notification/notification.module';
 import { QueueModule } from './queue/queue.module';
 import { StellarSyncModule } from './stellar-sync/stellar-sync.module';
-import { PortfolioModule } from './portfolio/portfolio.module';
 import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
 
 import databaseConfig from './database/database.config';
@@ -66,7 +65,6 @@ import { TestController } from './test/test.controller';
     QueueModule,
     StellarSyncModule,
     ExchangeRatesModule,
-    PortfolioModule,
   ],
   controllers: [AppController, TestController, TestExceptionController],
   providers: [

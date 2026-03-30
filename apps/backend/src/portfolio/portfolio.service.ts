@@ -249,15 +249,14 @@ export class PortfolioService {
 
     const convertedTotal = Math.round(totalUsd * exchangeRate * 100) / 100;
 
-    const convertedAssets: AssetBalanceWithCurrencyDto[] = usdSummary.assets.map(
-      (asset) => ({
+    const convertedAssets: AssetBalanceWithCurrencyDto[] =
+      usdSummary.assets.map((asset) => ({
         assetCode: asset.assetCode,
         assetIssuer: asset.assetIssuer,
         amount: asset.amount,
         value: Math.round(asset.valueUsd * exchangeRate * 100) / 100,
         valueUsd: asset.valueUsd,
-      }),
-    );
+      }));
 
     return {
       totalValue: convertedTotal.toFixed(2),

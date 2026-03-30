@@ -118,10 +118,9 @@ export class ExchangeRatesService {
         throw new Error('Empty response from CoinGecko');
       }
 
-      const fromId = this.mapCurrencyToCoingeckoId(fromCurrency);
       const toId = this.mapCurrencyToCoingeckoId(toCurrency);
 
-      const rate = data.rates ? data.rates[toId] : data[fromId]?.[toId];
+      const rate = data.rates[toId];
 
       if (rate === undefined || rate === null) {
         throw new Error(
@@ -130,10 +129,10 @@ export class ExchangeRatesService {
       }
 
       return rate;
-    } catch (error) {
-      this.logger.debug(
-        `CoinGecko API fallback: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.debug(`CoinGecko API fallback: ${errorMessage}`);
 
       // Fallback to simple exchange rate API
       return this.fetchFromExchangeRateApi(fromCurrency, toCurrency);
@@ -150,7 +149,7 @@ export class ExchangeRatesService {
     // Use fixer.io or similar free API as fallback
     // For free tier, we'll use a simple fetch approach
     const response = await this.httpService
-      .get<any>(
+      .get<ExchangeRateResponse>(
         `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`,
       )
       .toPromise();

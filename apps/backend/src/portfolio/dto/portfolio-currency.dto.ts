@@ -1,5 +1,4 @@
-import { IsOptional, IsEnum, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum CurrencyCode {
@@ -90,7 +89,8 @@ export class PortfolioSummaryWithCurrencyResponseDto {
   hasLinkedAccount: boolean;
 
   @ApiProperty({
-    description: 'Exchange rate applied for conversion (from USD to target currency)',
+    description:
+      'Exchange rate applied for conversion (from USD to target currency)',
     example: 0.92,
   })
   exchangeRate: number;
