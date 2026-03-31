@@ -20,6 +20,8 @@ import {
 } from './dto/portfolio-currency.dto';
 import { PortfolioPerformanceResponseDto } from './dto/portfolio-performance.dto';
 import { calculatePortfolioPerformance } from './utils/portfolio-performance.utils';
+import { PortfolioSnapshotQueueService } from './queue/portfolio-snapshot.queue.service';
+import { PortfolioSnapshotBatchStatus } from './queue/portfolio-snapshot.types';
 import { ExchangeRatesService } from '../exchange-rates/exchange-rates.service';
 
 @Injectable()
@@ -37,6 +39,7 @@ export class PortfolioService {
     private readonly exchangeRatesService: ExchangeRatesService,
     private readonly stellarService: StellarService,
     private readonly priceService: PriceService,
+    private readonly snapshotQueueService: PortfolioSnapshotQueueService,
   ) {}
 
   /**
@@ -307,54 +310,33 @@ export class PortfolioService {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async createSnapshotsForAllUsers(): Promise<void> {
     this.logger.log('Starting scheduled snapshot creation for all users');
-
-    const users = await this.userRepository.find();
-    let successCount = 0;
-    let failCount = 0;
-
-    for (const user of users) {
-      try {
-        await this.createSnapshot(user.id);
-        successCount++;
-      } catch (error: unknown) {
-        this.logger.error(
-          `Failed to create snapshot for user ${user.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
-        failCount++;
-      }
+    try {
+      const progress =
+        await this.snapshotQueueService.enqueueSnapshotBatch('cron');
+      this.logger.log(
+        `Snapshot batch queued (cron). BatchId=${progress.batchId}`,
+      );
+    } catch (error: unknown) {
+      this.logger.error(
+        `Failed to queue snapshot batch job: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
     }
-
-    this.logger.log(
-      `Snapshot creation completed. Success: ${successCount}, Failed: ${failCount}`,
-    );
   }
 
   /**
    * Manual trigger for creating snapshots (useful for testing)
    */
-  async triggerSnapshotCreation(): Promise<{
-    success: number;
-    failed: number;
-  }> {
+  async triggerSnapshotCreation(): Promise<PortfolioSnapshotBatchStatus> {
     this.logger.log('Manual snapshot creation triggered');
+    return this.snapshotQueueService.enqueueSnapshotBatch('manual');
+  }
 
-    const users = await this.userRepository.find();
-    let successCount = 0;
-    let failCount = 0;
-
-    for (const user of users) {
-      try {
-        await this.createSnapshot(user.id);
-        successCount++;
-      } catch (error: unknown) {
-        this.logger.error(
-          `Failed to create snapshot for user ${user.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
-        failCount++;
-      }
-    }
-
-    return { success: successCount, failed: failCount };
+  async getSnapshotBatchStatus(
+    batchId: string,
+  ): Promise<PortfolioSnapshotBatchStatus> {
+    return this.snapshotQueueService.getBatchStatus(batchId);
   }
 
   /**
