@@ -166,11 +166,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${orbitron.variable} ${spaceMono.variable} ${chakraPetch.variable} ${poppins.variable} font-inter bg-background text-foreground`}
       >
-        <Providers>
-          <StarsAnimation />
-          {children}
-          <PWAInstaller />
-        </Providers>
+        <OnboardingProvider>
+          <StellarProvider>
+            <StarsAnimation />
+            {children}
+            <PWAInstaller />
+          </StellarProvider>
+        </OnboardingProvider>
       </body>
     </html>
   );
